@@ -62,13 +62,13 @@ export default function Sidebar({
                 <div className="sidebar-sub-options">
                   <button
                     className={`sub-opt ${gameType === "synonyms" ? "active" : ""}`}
-                    onClick={() => onGameTypeChange("synonyms")}
+                    onClick={() => { onGameTypeChange("synonyms"); onClose(); }}
                   >
                     🟣 Synonyms
                   </button>
                   <button
                     className={`sub-opt ${gameType === "antonyms" ? "active" : ""}`}
-                    onClick={() => onGameTypeChange("antonyms")}
+                    onClick={() => { onGameTypeChange("antonyms"); onClose(); }}
                   >
                     🟠 Antonyms
                   </button>
