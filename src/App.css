@@ -466,14 +466,28 @@ button { cursor: pointer; font-family: inherit; }
   font-weight: 700;
 }
 
-.correct-badge {
+.streak-badge {
   margin-left: auto;
+  background: #fff7ed;
+  color: #c2410c;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.correct-badge {
   background: #dcfce7;
   color: #15803d;
   border-radius: 8px;
   padding: 6px 14px;
   font-size: 0.95rem;
   font-weight: 800;
+}
+
+/* push correct badge to the right when no streak badge is shown */
+.type-badge + .correct-badge {
+  margin-left: auto;
 }
 
 .wrong-badge {
@@ -485,30 +499,166 @@ button { cursor: pointer; font-family: inherit; }
   font-weight: 800;
 }
 
-/* ───── Round complete overlay ───── */
-.round-overlay {
+/* ───── Round summary overlay ───── */
+.summary-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(255, 255, 255, 0.88);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background: rgba(255, 255, 255, 0.97);
   border-radius: 24px;
   z-index: 10;
-  animation: fadeIn 0.2s ease;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  animation: fadeIn 0.25s ease;
+  overflow-y: auto;
+  padding: 24px 16px;
 }
 
-.round-msg {
-  font-size: 1.8rem;
-  font-weight: 900;
-  color: #16a34a;
+.summary-card {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
   text-align: center;
-  animation: pop 0.4s ease;
+}
+
+.summary-round-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #9ca3af;
+}
+
+.summary-title {
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: #1e1b4b;
+  margin: 0;
+}
+
+.streak-banner {
+  background: #fff7ed;
+  color: #c2410c;
+  border-radius: 20px;
+  padding: 6px 18px;
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.summary-results {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.summary-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f9fafb;
+  border-radius: 10px;
+  padding: 8px 14px;
+}
+
+.summary-pair {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #374151;
+}
+
+.stars-row {
+  display: flex;
+  gap: 2px;
+}
+
+.star-icon {
+  font-size: 1rem;
+}
+
+.star-icon.lit  { color: #f59e0b; }
+.star-icon.dim  { color: #e5e7eb; }
+
+.summary-score {
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: #4c1d95;
+}
+
+/* ───── Game complete stats ───── */
+.gc-stats {
+  display: flex;
+  gap: 16px;
+  background: #f9fafb;
+  border-radius: 16px;
+  padding: 14px 20px;
+  width: 100%;
+  justify-content: space-around;
+}
+
+.gc-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.gc-stat-value {
+  font-size: 1.6rem;
+  font-weight: 900;
+}
+
+.gc-stat-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #9ca3af;
+}
+
+.gc-correct { color: #15803d; }
+.gc-wrong   { color: #dc2626; }
+.gc-stars   { color: #4c1d95; }
+
+.summary-buttons {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 @keyframes fadeIn {
   from { opacity: 0; }
   to   { opacity: 1; }
+}
+
+/* ───── Progress bar ───── */
+.progress-wrap {
+  position: relative;
+  height: 22px;
+  background: #f3f4f6;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #7c3aed, #a855f7);
+  border-radius: 20px;
+  transition: width 0.4s ease;
+}
+
+.progress-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #4c1d95;
 }
 
 .game-instruction {
@@ -584,6 +734,16 @@ button { cursor: pointer; font-family: inherit; }
   color: #15803d !important;
   font-weight: 800;
   animation: pop 0.35s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.card-stars {
+  font-size: 0.65rem;
+  line-height: 1;
+  letter-spacing: 1px;
 }
 
 .word-card:disabled {
