@@ -501,11 +501,10 @@ button { cursor: pointer; font-family: inherit; }
 
 /* ───── Round summary overlay ───── */
 .summary-overlay {
-  position: absolute;
+  position: fixed;
   inset: 0;
-  background: rgba(255, 255, 255, 0.97);
-  border-radius: 24px;
-  z-index: 10;
+  background: #f5f3ff;
+  z-index: 100;
   display: flex;
   align-items: flex-start;
   justify-content: center;
@@ -516,6 +515,7 @@ button { cursor: pointer; font-family: inherit; }
 
 .summary-card {
   width: 100%;
+  max-width: 560px;
   display: flex;
   flex-direction: column;
   align-items: center;
