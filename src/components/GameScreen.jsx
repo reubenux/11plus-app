@@ -1,7 +1,9 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import { wordData } from "../data/words";
+import GameComplete from "./GameComplete";
 
-const PAIRS_PER_ROUND = 6;
+const TOTAL_QUESTIONS = 20;
+const BOARD_SIZE = 6;
 
 function shuffle(arr) {
   const a = [...arr];
@@ -12,98 +14,161 @@ function shuffle(arr) {
   return a;
 }
 
+function getStars(wrongCount) {
+  if (wrongCount === 0) return 3;
+  if (wrongCount === 1) return 2;
+  return 1;
+}
+
+// Weak words (low stars) come first
+function buildPrioritisedList(allPairs, performance) {
+  const t1 = shuffle(allPairs.filter((p) => performance[p.word] === 1));
+  const t2 = shuffle(allPairs.filter((p) => performance[p.word] === 2));
+  const t3 = shuffle(allPairs.filter((p) => !performance[p.word] || performance[p.word] >= 3));
+  return [...t1, ...t2, ...t3];
+}
+
+let _uid = 0;
+function makeItem(pair) {
+  return { uid: _uid++, word: pair.word, match: pair.match, wrongCount: 0 };
+}
+
 export default function GameScreen({ level, gameType, onHome }) {
-  const allPairs = wordData[level][gameType];
+  const allPairs     = wordData[level][gameType];
+  const performance  = useRef({});  // word → last stars, persists across replays
 
-  const [bank, setBank] = useState(() => shuffle([...allPairs]));
-  const [startIdx, setStartIdx] = useState(0);
-  const [roundNum, setRoundNum] = useState(1);
-  const [totalCorrect, setTotalCorrect] = useState(0);
-  const [totalWrong, setTotalWrong] = useState(0);
-  const [roundComplete, setRoundComplete] = useState(false);
-
-  const [selectedLeft, setSelectedLeft] = useState(null);
-  const [matchedLeft, setMatchedLeft] = useState({});
-  const [matchedRight, setMatchedRight] = useState({});
-  const [wrongPair, setWrongPair] = useState(null);
-  const [score, setScore] = useState(0);
-
-  const pairs = useMemo(
-    () => bank.slice(startIdx, startIdx + PAIRS_PER_ROUND),
-    [bank, startIdx]
-  );
-
-  const leftCards = useMemo(
-    () => shuffle(pairs.map((p, i) => ({ ...p, origIdx: i }))),
-    [pairs]
-  );
-  const rightWords = useMemo(() => shuffle(pairs.map((p) => p.match)), [pairs]);
-
-  useEffect(() => {
-    if (score > 0 && score === pairs.length) {
-      setRoundComplete(true);
-      setTotalCorrect((t) => t + score);
-
-      const t = setTimeout(() => {
-        const nextIdx = startIdx + PAIRS_PER_ROUND;
-        const newBank = nextIdx >= bank.length ? shuffle([...allPairs]) : bank;
-        const newStart = nextIdx >= bank.length ? 0 : nextIdx;
-
-        setBank(newBank);
-        setStartIdx(newStart);
-        setScore(0);
-        setSelectedLeft(null);
-        setMatchedLeft({});
-        setMatchedRight({});
-        setWrongPair(null);
-        setRoundComplete(false);
-        setRoundNum((r) => r + 1);
-      }, 1200);
-
-      return () => clearTimeout(t);
-    }
-  }, [score, pairs.length]);
-
-  function handleLeftTap(card) {
-    if (matchedLeft[card.origIdx]) return;
-    setSelectedLeft(card);
+  function buildGame() {
+    const list = buildPrioritisedList(allPairs, performance.current);
+    // Cycle list if fewer words than TOTAL_QUESTIONS
+    const full = Array.from({ length: TOTAL_QUESTIONS }, (_, i) => list[i % list.length]);
+    return {
+      board:      full.slice(0, BOARD_SIZE).map(makeItem),
+      queue:      full.slice(BOARD_SIZE),          // 14 pairs waiting
+      rightOrder: shuffle([0, 1, 2, 3, 4, 5]),     // independent right-column order
+    };
   }
 
-  function handleRightTap(word) {
-    if (!selectedLeft) return;
-    if (matchedRight[word]) return;
+  const [game, setGame]               = useState(() => buildGame());
+  const [results, setResults]         = useState([]);
+  const [selectedLeft, setSelectedLeft] = useState(null);   // item uid
+  const [justMatched, setJustMatched] = useState(null);     // { uid, rightIdx, stars }
+  const [wrongFlash, setWrongFlash]   = useState(null);     // { leftIdx, rightIdx }
+  const [streak, setStreak]           = useState(0);
+  const [totalWrong, setTotalWrong]   = useState(0);
+  const [gameComplete, setGameComplete] = useState(false);
 
-    if (selectedLeft.match === word) {
-      setMatchedLeft((prev) => ({ ...prev, [selectedLeft.origIdx]: true }));
-      setMatchedRight((prev) => ({ ...prev, [word]: true }));
-      setScore((s) => s + 1);
+  const { board, queue, rightOrder } = game;
+
+  function handleLeftTap(leftIdx) {
+    if (wrongFlash !== null) return;
+    if (justMatched?.uid === board[leftIdx]?.uid) return; // can't tap the one currently animating
+    setSelectedLeft(board[leftIdx].uid);
+  }
+
+  function handleRightTap(rightIdx) {
+    if (selectedLeft === null || justMatched !== null || wrongFlash !== null) return;
+
+    const leftIdx = board.findIndex((b) => b.uid === selectedLeft);
+    if (leftIdx === -1) return;
+
+    const boardIdxForRight = rightOrder[rightIdx];
+    const isCorrect       = leftIdx === boardIdxForRight;
+
+    if (isCorrect) {
+      const item      = board[leftIdx];
+      const stars     = getStars(item.wrongCount);
+      const newResult = { word: item.word, match: item.match, stars };
+      const newResults = [...results, newResult];
+      const newStreak = item.wrongCount === 0 ? streak + 1 : 0;
+
+      performance.current[item.word] = stars;
+      setResults(newResults);
+      setStreak(newStreak);
       setSelectedLeft(null);
-    } else {
-      setTotalWrong((w) => w + 1);
-      setWrongPair({ left: selectedLeft.origIdx, right: word });
+      setJustMatched({ uid: item.uid, rightIdx, stars });
+
       setTimeout(() => {
-        setWrongPair(null);
+        if (newResults.length >= TOTAL_QUESTIONS) {
+          setGameComplete(true);
+          setJustMatched(null);
+          return;
+        }
+
+        if (queue.length > 0) {
+          // Replace matched slot with next from queue
+          const nextPair = queue[0];
+          const newBoard = board.map((slot, i) =>
+            i === leftIdx ? makeItem(nextPair) : slot
+          );
+          setGame({ board: newBoard, queue: queue.slice(1), rightOrder });
+        } else {
+          // Queue exhausted — shrink the board for the final matches
+          const newBoard      = board.filter((_, i) => i !== leftIdx);
+          const newRightOrder = rightOrder
+            .filter((idx) => idx !== leftIdx)
+            .map((idx) => (idx > leftIdx ? idx - 1 : idx));
+          setGame({ board: newBoard, queue: [], rightOrder: newRightOrder });
+        }
+
+        setJustMatched(null);
+      }, 700);
+
+    } else {
+      // Wrong — increment wrongCount for this slot
+      setGame((prev) => ({
+        ...prev,
+        board: prev.board.map((slot, i) =>
+          i === leftIdx ? { ...slot, wrongCount: slot.wrongCount + 1 } : slot
+        ),
+      }));
+      setTotalWrong((w) => w + 1);
+      setStreak(0);
+      setWrongFlash({ leftIdx, rightIdx });
+      setTimeout(() => {
+        setWrongFlash(null);
         setSelectedLeft(null);
       }, 600);
     }
   }
 
+  function handlePlayAgain() {
+    setGame(buildGame());
+    setResults([]);
+    setSelectedLeft(null);
+    setJustMatched(null);
+    setWrongFlash(null);
+    setStreak(0);
+    setTotalWrong(0);
+    setGameComplete(false);
+  }
+
   const typeLabel = gameType === "synonyms" ? "Synonyms" : "Antonyms";
+  const progress  = (results.length / TOTAL_QUESTIONS) * 100;
 
   return (
     <div className="game-screen">
-      {roundComplete && (
-        <div className="round-overlay">
-          <div className="round-msg">🎉 Round {roundNum} Complete!</div>
-        </div>
+      {gameComplete && (
+        <GameComplete
+          results={results}
+          totalWrong={totalWrong}
+          onPlayAgain={handlePlayAgain}
+          onHome={onHome}
+        />
       )}
 
       <div className="game-header">
         <button className="back-btn" onClick={onHome}>← Home</button>
         <span className="level-badge">Level {level}</span>
         <span className="type-badge">{typeLabel}</span>
-        <span className="correct-badge">✓ {totalCorrect}</span>
+        {streak > 0 && <span className="streak-badge">🔥 {streak}</span>}
+        <span className="correct-badge">✓ {results.length}</span>
         <span className="wrong-badge">✗ {totalWrong}</span>
+      </div>
+
+      {/* Progress bar */}
+      <div className="progress-wrap">
+        <div className="progress-fill" style={{ width: `${progress}%` }} />
+        <span className="progress-label">{results.length} / {TOTAL_QUESTIONS}</span>
       </div>
 
       <p className="game-instruction">
@@ -114,41 +179,43 @@ export default function GameScreen({ level, gameType, onHome }) {
 
       <div className="columns">
         <div className="column">
-          {leftCards.map((card) => {
-            const isMatched = matchedLeft[card.origIdx];
-            const isSelected = selectedLeft?.origIdx === card.origIdx;
-            const isWrong = wrongPair?.left === card.origIdx;
+          {board.map((item, leftIdx) => {
+            const isMatched  = justMatched?.uid === item.uid;
+            const isWrong    = wrongFlash?.leftIdx === leftIdx;
+            const isSelected = selectedLeft === item.uid;
             return (
               <button
-                key={card.origIdx}
+                key={leftIdx}
                 className={`word-card left-card ${isMatched ? "matched" : ""} ${isSelected ? "selected" : ""} ${isWrong ? "wrong" : ""}`}
-                onClick={() => handleLeftTap(card)}
+                onClick={() => handleLeftTap(leftIdx)}
                 disabled={isMatched}
               >
-                {card.word}
+                <span>{item.word}</span>
+                {isMatched && (
+                  <span className="card-stars">{"⭐".repeat(justMatched.stars)}</span>
+                )}
               </button>
             );
           })}
         </div>
 
         <div className="column-divider">
-          {Array.from({ length: pairs.length }).map((_, i) => (
-            <div key={i} className="divider-dot" />
-          ))}
+          {board.map((_, i) => <div key={i} className="divider-dot" />)}
         </div>
 
         <div className="column">
-          {rightWords.map((word) => {
-            const isMatched = matchedRight[word];
-            const isWrong = wrongPair?.right === word;
+          {rightOrder.map((boardIdx, rightIdx) => {
+            const item      = board[boardIdx];
+            const isMatched = justMatched?.rightIdx === rightIdx;
+            const isWrong   = wrongFlash?.rightIdx === rightIdx;
             return (
               <button
-                key={word}
+                key={rightIdx}
                 className={`word-card right-card ${isMatched ? "matched" : ""} ${isWrong ? "wrong" : ""}`}
-                onClick={() => handleRightTap(word)}
+                onClick={() => handleRightTap(rightIdx)}
                 disabled={isMatched}
               >
-                {word}
+                {item.match}
               </button>
             );
           })}
