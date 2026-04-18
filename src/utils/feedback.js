@@ -23,12 +23,13 @@ export function playCorrect() {
   // Haptic — short single pulse
   try { if (navigator.vibrate) navigator.vibrate(40); } catch (_) {}
 
-  // Sound — ascending two-note chime (C5 → E5)
+  // Sound — soft bowl arpeggio (C5 → G5 → C6), slow decay, low volume
   try {
     const c   = audioCtx();
     const now = c.currentTime;
-    tone(523, now,        0.18);  // C5
-    tone(659, now + 0.12, 0.22);  // E5
+    tone(523,  now,        0.6,  0.18);  // C5
+    tone(784,  now + 0.12, 0.55, 0.12);  // G5
+    tone(1047, now + 0.24, 0.7,  0.08);  // C6
   } catch (_) {}
 }
 
