@@ -2,6 +2,8 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import {
   GoogleAuthProvider,
   signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   signOut,
   onAuthStateChanged,
   signInWithEmailAndPassword,
@@ -17,15 +19,33 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(undefined); // undefined = loading
 
   useEffect(() => {
+    // Handle redirect-based sign-in result (fallback from popup on some browsers)
+    getRedirectResult(auth).catch(() => {});
+
     const unsub = onAuthStateChanged(auth, async (u) => {
-      if (u) await mergeFromCloud(u.uid);
-      setUser(u ?? null);
+      try {
+        if (u) await mergeFromCloud(u.uid);
+      } catch (e) {
+        console.error("mergeFromCloud error:", e);
+      } finally {
+        setUser(u ?? null);
+      }
     });
     return unsub;
   }, []);
 
   async function signInWithGoogle() {
-    await signInWithPopup(auth, new GoogleAuthProvider());
+    const provider = new GoogleAuthProvider();
+    try {
+      await signInWithPopup(auth, provider);
+    } catch (e) {
+      // Popup blocked or not supported — fall back to redirect
+      if (e.code === "auth/popup-blocked" || e.code === "auth/popup-cancelled" || e.code === "auth/cancelled-popup-request") {
+        await signInWithRedirect(auth, provider);
+      } else {
+        throw e;
+      }
+    }
   }
 
   async function signInWithEmail(email, password) {
