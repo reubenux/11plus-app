@@ -3,11 +3,13 @@ import Sidebar from "./components/Sidebar";
 import HomeScreen from "./components/HomeScreen";
 import GameScreen from "./components/GameScreen";
 import ComingSoon from "./components/ComingSoon";
+import AuthButton from "./components/AuthButton";
+import { AuthProvider } from "./contexts/AuthContext";
 import "./App.css";
 
 const WORD_MATCH_ID = "wordMatch";
 
-export default function App() {
+function AppInner() {
   const [selectedGame, setSelectedGame] = useState(WORD_MATCH_ID);
   const [gameType, setGameType] = useState("synonyms");
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -73,7 +75,19 @@ export default function App() {
             />
           )}
         </div>
+
+        <div className="auth-bar">
+          <AuthButton />
+        </div>
       </div>
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <AppInner />
+    </AuthProvider>
   );
 }

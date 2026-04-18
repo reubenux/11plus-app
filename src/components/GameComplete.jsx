@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { saveIfBest, saveRun, getBest, formatTime } from "../utils/leaderboard";
+import { pushToCloud } from "../utils/cloudScores";
+import { useAuth } from "../contexts/AuthContext";
 
 function Stars({ count }) {
   return (
@@ -17,10 +19,13 @@ export default function GameComplete({ results, totalWrong, timeTaken, onPlayAga
   const pct        = Math.round((totalStars / maxStars) * 100);
   const title      = pct === 100 ? "🌟 Perfect!" : pct >= 70 ? "🎉 Great job!" : "✅ Done!";
 
+  const { user } = useAuth();
   const [prevBest]  = useState(() => getBest(level, gameType));
   const [isNewBest] = useState(() => {
     saveRun(level, gameType, totalStars, totalWrong, timeTaken);
-    return saveIfBest(level, gameType, totalStars, totalWrong, timeTaken);
+    const newBest = saveIfBest(level, gameType, totalStars, totalWrong, timeTaken);
+    if (user) pushToCloud(user.uid);
+    return newBest;
   });
 
   return (

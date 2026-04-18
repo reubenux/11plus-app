@@ -231,6 +231,87 @@ body {
   background: #f5f3ff;
 }
 
+/* ───── Auth bar ───── */
+.auth-bar {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  z-index: 150;
+}
+
+.google-signin-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: white;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 10px 16px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #374151;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+  cursor: pointer;
+  transition: box-shadow 0.15s;
+}
+.google-signin-btn:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.18); }
+
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: white;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 24px;
+  padding: 6px 14px 6px 6px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+  cursor: pointer;
+  position: relative;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #374151;
+}
+
+.user-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.user-name { font-size: 0.88rem; font-weight: 700; color: #1e1b4b; }
+
+.user-menu {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  right: 0;
+  background: white;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 12px;
+  min-width: 200px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.user-menu-name  { font-weight: 800; color: #1e1b4b; font-size: 0.9rem; }
+.user-menu-email { font-size: 0.78rem; color: #6b7280; margin-bottom: 8px; }
+
+.user-menu-signout {
+  background: #fef2f2;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: #dc2626;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-align: left;
+}
+.user-menu-signout:hover { background: #fee2e2; }
+
 /* ───── Main area ───── */
 .main-area {
   flex: 1;
