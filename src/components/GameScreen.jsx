@@ -1,6 +1,7 @@
 import React, { useState, useRef } from "react";
 import { wordData } from "../data/words";
 import GameComplete from "./GameComplete";
+import { playCorrect, playWrong } from "../utils/feedback";
 
 const TOTAL_QUESTIONS = 20;
 const BOARD_SIZE = 6;
@@ -56,6 +57,7 @@ export default function GameScreen({ level, gameType, onHome }) {
   const [streak, setStreak]           = useState(0);
   const [totalWrong, setTotalWrong]   = useState(0);
   const [gameComplete, setGameComplete] = useState(false);
+  const [muted, setMuted]             = useState(false);
 
   const { board, queue, rightOrder } = game;
 
@@ -82,6 +84,7 @@ export default function GameScreen({ level, gameType, onHome }) {
       const newStreak = item.wrongCount === 0 ? streak + 1 : 0;
 
       performance.current[item.word] = stars;
+      if (!muted) playCorrect();
       setResults(newResults);
       setStreak(newStreak);
       setSelectedLeft(null);
@@ -121,6 +124,7 @@ export default function GameScreen({ level, gameType, onHome }) {
           i === leftIdx ? { ...slot, wrongCount: slot.wrongCount + 1 } : slot
         ),
       }));
+      if (!muted) playWrong();
       setTotalWrong((w) => w + 1);
       setStreak(0);
       setWrongFlash({ leftIdx, rightIdx });
@@ -163,6 +167,9 @@ export default function GameScreen({ level, gameType, onHome }) {
         {streak > 0 && <span className="streak-badge">🔥 {streak}</span>}
         <span className="correct-badge">✓ {results.length}</span>
         <span className="wrong-badge">✗ {totalWrong}</span>
+        <button className="mute-btn" onClick={() => setMuted((m) => !m)} aria-label={muted ? "Unmute" : "Mute"}>
+          {muted ? "🔇" : "🔊"}
+        </button>
       </div>
 
       {/* Progress bar */}

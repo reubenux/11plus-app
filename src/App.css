@@ -611,6 +611,17 @@ button { cursor: pointer; font-family: inherit; }
   font-weight: 800;
 }
 
+.mute-btn {
+  background: #f3f4f6;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.mute-btn:hover { background: #e5e7eb; }
+
 /* ───── Round summary overlay ───── */
 .summary-overlay {
   position: fixed;
