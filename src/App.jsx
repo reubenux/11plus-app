@@ -68,6 +68,7 @@ export default function App() {
               key={playKey}
               level={config.level}
               gameType={gameType}
+              totalQuestions={config.totalQuestions}
               onHome={handleHome}
             />
           )}

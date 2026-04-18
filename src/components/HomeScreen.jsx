@@ -20,10 +20,12 @@ const TYPE_INFO = {
   },
 };
 
+const Q_OPTIONS = [5, 10, 20, 30];
 const MAX_STARS = 60;
 
 export default function HomeScreen({ gameType, onPlay }) {
-  const [level, setLevel] = useState("A");
+  const [level, setLevel]               = useState("A");
+  const [totalQuestions, setTotal]      = useState(20);
   const info = TYPE_INFO[gameType];
   const best = getBest(level, gameType);
 
@@ -61,6 +63,24 @@ export default function HomeScreen({ gameType, onPlay }) {
           })}
         </div>
 
+        <div className="section-label">Number of Questions</div>
+        <div className="q-bar">
+          {Q_OPTIONS.map((q, i) => {
+            const activeIdx  = Q_OPTIONS.indexOf(totalQuestions);
+            const isFilled   = i <= activeIdx;
+            const isSelected = q === totalQuestions;
+            return (
+              <button
+                key={q}
+                className={`q-segment ${isFilled ? "filled" : ""} ${isSelected ? "selected" : ""}`}
+                onClick={() => setTotal(q)}
+              >
+                {q}
+              </button>
+            );
+          })}
+        </div>
+
         {best ? (
           <div className="home-best">
             <span className="home-best-label">🏆 Personal Best</span>
@@ -73,7 +93,7 @@ export default function HomeScreen({ gameType, onPlay }) {
           </div>
         )}
 
-        <button className="play-btn" onClick={() => onPlay({ level })}>
+        <button className="play-btn" onClick={() => onPlay({ level, totalQuestions })}>
           Play! 🎮
         </button>
       </div>

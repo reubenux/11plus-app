@@ -3,7 +3,6 @@ import { wordData } from "../data/words";
 import GameComplete from "./GameComplete";
 import { playCorrect, playWrong } from "../utils/feedback";
 
-const TOTAL_QUESTIONS = 20;
 const BOARD_SIZE = 5;
 
 function shuffle(arr) {
@@ -34,14 +33,14 @@ function makeItem(pair) {
   return { uid: _uid++, word: pair.word, match: pair.match, wrongCount: 0 };
 }
 
-export default function GameScreen({ level, gameType, onHome }) {
+export default function GameScreen({ level, gameType, totalQuestions = 20, onHome }) {
   const allPairs     = wordData[level][gameType];
   const performance  = useRef({});  // word → last stars, persists across replays
 
   function buildGame() {
     const list = buildPrioritisedList(allPairs, performance.current);
-    // Cycle list if fewer words than TOTAL_QUESTIONS
-    const full = Array.from({ length: TOTAL_QUESTIONS }, (_, i) => list[i % list.length]);
+    // Cycle list if fewer words than totalQuestions
+    const full = Array.from({ length: totalQuestions }, (_, i) => list[i % list.length]);
     return {
       board:      full.slice(0, BOARD_SIZE).map(makeItem),
       queue:      full.slice(BOARD_SIZE),          // 14 pairs waiting
@@ -91,7 +90,7 @@ export default function GameScreen({ level, gameType, onHome }) {
       setJustMatched({ uid: item.uid, rightIdx, stars });
 
       setTimeout(() => {
-        if (newResults.length >= TOTAL_QUESTIONS) {
+        if (newResults.length >= totalQuestions) {
           setGameComplete(true);
           setJustMatched(null);
           return;
@@ -147,7 +146,7 @@ export default function GameScreen({ level, gameType, onHome }) {
   }
 
   const typeLabel = gameType === "synonyms" ? "Synonyms" : "Antonyms";
-  const progress  = (results.length / TOTAL_QUESTIONS) * 100;
+  const progress  = (results.length / totalQuestions) * 100;
 
   return (
     <div className="game-screen">
@@ -177,7 +176,7 @@ export default function GameScreen({ level, gameType, onHome }) {
       {/* Progress bar */}
       <div className="progress-wrap">
         <div className="progress-fill" style={{ width: `${progress}%` }} />
-        <span className="progress-label">{results.length} / {TOTAL_QUESTIONS}</span>
+        <span className="progress-label">{results.length} / {totalQuestions}</span>
       </div>
 
       <p className="game-instruction">
