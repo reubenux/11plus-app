@@ -157,6 +157,8 @@ export default function GameScreen({ level, gameType, onHome }) {
           totalWrong={totalWrong}
           onPlayAgain={handlePlayAgain}
           onHome={onHome}
+          level={level}
+          gameType={gameType}
         />
       )}
 

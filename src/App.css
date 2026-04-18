@@ -505,8 +505,77 @@ button { cursor: pointer; font-family: inherit; }
 .level-emoji { font-size: 1.5rem; }
 .level-label { font-size: 0.95rem; font-weight: 800; color: #1f2937; }
 .level-desc  { font-size: 0.7rem; color: #6b7280; font-weight: 600; }
+.level-best  { font-size: 0.68rem; font-weight: 700; color: #7c3aed; margin-top: 2px; }
 
 .level-btn:hover:not(.active) { border-color: #a855f7; }
+
+/* ───── Personal Best (HomeScreen) ───── */
+.home-best {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fdf4ff;
+  border: 1.5px solid #e9d5ff;
+  border-radius: 12px;
+  padding: 10px 16px;
+  flex-wrap: wrap;
+}
+
+.home-best--empty {
+  background: #f9fafb;
+  border-color: #e5e7eb;
+  color: #9ca3af;
+  font-size: 0.9rem;
+  font-weight: 600;
+  justify-content: center;
+}
+
+.home-best-label {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #7c3aed;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.home-best-score {
+  font-size: 1rem;
+  font-weight: 900;
+  color: #4c1d95;
+}
+
+.home-best-detail {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #6b7280;
+  margin-left: auto;
+}
+
+/* ───── New Best / Prev Best banners (GameComplete) ───── */
+.new-best-banner {
+  background: linear-gradient(135deg, #fef9c3, #fde68a);
+  border: 2px solid #f59e0b;
+  border-radius: 14px;
+  padding: 10px 20px;
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: #92400e;
+  animation: pop 0.4s ease;
+  width: 100%;
+  text-align: center;
+}
+
+.prev-best-banner {
+  background: #f9fafb;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 8px 16px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #6b7280;
+  width: 100%;
+  text-align: center;
+}
 
 /* ───── Play Button ───── */
 .play-btn {

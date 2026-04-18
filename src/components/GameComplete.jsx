@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+import { saveIfBest, getBest } from "../utils/leaderboard";
 
 function Stars({ count }) {
   return (
@@ -10,16 +11,32 @@ function Stars({ count }) {
   );
 }
 
-export default function GameComplete({ results, totalWrong, onPlayAgain, onHome }) {
-  const totalStars   = results.reduce((sum, r) => sum + r.stars, 0);
-  const maxStars     = results.length * 3;
-  const pct          = Math.round((totalStars / maxStars) * 100);
-  const title        = pct === 100 ? "🌟 Perfect!" : pct >= 70 ? "🎉 Great job!" : "✅ Done!";
+export default function GameComplete({ results, totalWrong, onPlayAgain, onHome, level, gameType }) {
+  const totalStars = results.reduce((sum, r) => sum + r.stars, 0);
+  const maxStars   = results.length * 3;
+  const pct        = Math.round((totalStars / maxStars) * 100);
+  const title      = pct === 100 ? "🌟 Perfect!" : pct >= 70 ? "🎉 Great job!" : "✅ Done!";
+
+  // Save once on mount; capture previous best before saving
+  const [prevBest]  = useState(() => getBest(level, gameType));
+  const [isNewBest] = useState(() => saveIfBest(level, gameType, totalStars, totalWrong));
 
   return (
     <div className="summary-overlay">
       <div className="summary-card">
         <h2 className="summary-title">{title}</h2>
+
+        {isNewBest && (
+          <div className="new-best-banner">
+            🏆 New Personal Best!
+          </div>
+        )}
+
+        {!isNewBest && prevBest && (
+          <div className="prev-best-banner">
+            Previous best: ⭐ {prevBest.stars}/{maxStars} · {prevBest.wrong} wrong · {prevBest.date}
+          </div>
+        )}
 
         <div className="gc-stats">
           <div className="gc-stat">
