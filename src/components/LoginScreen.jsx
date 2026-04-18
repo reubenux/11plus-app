@@ -20,7 +20,8 @@ function friendlyError(code, message) {
     case "auth/email-already-in-use":  return "An account with this email already exists.";
     case "auth/weak-password":         return "Password must be at least 6 characters.";
     case "auth/invalid-email":         return "Please enter a valid email address.";
-    case "auth/too-many-requests":     return "Too many attempts. Please try again later.";
+    case "auth/too-many-requests":      return "Too many attempts. Please try again later.";
+    case "auth/operation-not-allowed":  return "Email/Password sign-in is not enabled. Please enable it in Firebase Console → Authentication → Sign-in method.";
     case "auth/popup-blocked":         return "Popup was blocked — please allow popups for this site.";
     case "auth/popup-closed-by-user":  return "Sign-in window was closed. Please try again.";
     case "auth/unauthorized-domain":   return "This domain isn't authorised in Firebase. Add it in Firebase Console → Authentication → Settings → Authorised domains.";
@@ -50,7 +51,9 @@ export default function LoginScreen() {
         await signInWithEmail(email, password);
       }
     } catch (err) {
-      setError(friendlyError(err.code));
+      console.error("Auth error:", err.code, err.message);
+      const msg = friendlyError(err.code, err.message);
+      if (msg) setError(msg);
     }
     setLoading(false);
   }
