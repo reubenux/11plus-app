@@ -145,6 +145,8 @@ export default function GameScreen({ level, gameType, totalQuestions = 20, onHom
   }
 
   function handlePlayAgain() {
+    startTimeRef.current = Date.now();
+    setElapsed(0);
     setGame(buildGame());
     setResults([]);
     setSelectedLeft(null);
@@ -158,20 +160,22 @@ export default function GameScreen({ level, gameType, totalQuestions = 20, onHom
   const typeLabel = gameType === "synonyms" ? "Synonyms" : "Antonyms";
   const progress  = (results.length / totalQuestions) * 100;
 
+  if (gameComplete) {
+    return (
+      <GameComplete
+        results={results}
+        totalWrong={totalWrong}
+        timeTaken={elapsed}
+        onPlayAgain={handlePlayAgain}
+        onHome={onHome}
+        level={level}
+        gameType={gameType}
+      />
+    );
+  }
+
   return (
     <div className="game-screen">
-      {gameComplete && (
-        <GameComplete
-          results={results}
-          totalWrong={totalWrong}
-          timeTaken={elapsed}
-          onPlayAgain={handlePlayAgain}
-          onHome={onHome}
-          level={level}
-          gameType={gameType}
-        />
-      )}
-
       <div className="game-header">
         <button className="back-btn" onClick={onHome}>← Home</button>
         <span className="level-badge">Level {level}</span>

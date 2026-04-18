@@ -31,7 +31,7 @@ function friendlyError(code, message) {
 }
 
 export default function LoginScreen() {
-  const { signInWithEmail, signUpWithEmail, signInWithGoogle } = useAuth();
+  const { signInWithEmail, signUpWithEmail, signInWithGoogle, redirectError } = useAuth();
 
   const [mode, setMode]         = useState("signin"); // "signin" | "signup"
   const [name, setName]         = useState("");
@@ -120,7 +120,11 @@ export default function LoginScreen() {
             />
           </div>
 
-          {error && <div className="login-error">{error}</div>}
+          {(error || redirectError) && (
+            <div className="login-error">
+              {error || friendlyError(redirectError) || `Sign-in error: ${redirectError}`}
+            </div>
+          )}
 
           <button className="login-submit-btn" type="submit" disabled={loading}>
             {loading ? "Please wait…" : mode === "signin" ? "Sign In" : "Create Account"}

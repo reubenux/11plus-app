@@ -2,8 +2,6 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import {
   GoogleAuthProvider,
   signInWithPopup,
-  signInWithRedirect,
-  getRedirectResult,
   signOut,
   onAuthStateChanged,
   signInWithEmailAndPassword,
@@ -16,30 +14,23 @@ import { mergeFromCloud } from "../utils/cloudScores";
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(undefined); // undefined = loading
+  const [user, setUser]           = useState(undefined); // undefined = loading
+  const [redirectError, setRedirectError] = useState(null);
 
   useEffect(() => {
-    // Process any pending Google redirect result first
-    getRedirectResult(auth)
-      .then((result) => {
-        if (result?.user) console.log("Redirect sign-in successful:", result.user.email);
-      })
-      .catch((e) => console.error("getRedirectResult error:", e.code));
-
-    const unsub = onAuthStateChanged(auth, async (u) => {
-      try {
-        if (u) await mergeFromCloud(u.uid);
-      } catch (e) {
-        console.error("mergeFromCloud error:", e);
-      } finally {
-        setUser(u ?? null);
-      }
+    const unsub = onAuthStateChanged(auth, (u) => {
+      setUser(u ?? null);
+      if (u) mergeFromCloud(u.uid).catch(console.error);
     });
     return unsub;
   }, []);
 
   async function signInWithGoogle() {
-    await signInWithRedirect(auth, new GoogleAuthProvider());
+    setRedirectError(null);
+    const provider = new GoogleAuthProvider();
+    // Always use popup — redirect flow breaks on localhost and many mobile
+    // browsers due to third-party cookie restrictions.
+    await signInWithPopup(auth, provider);
   }
 
   async function signInWithEmail(email, password) {
@@ -56,7 +47,14 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, signInWithGoogle, signInWithEmail, signUpWithEmail, signOut: handleSignOut }}>
+    <AuthContext.Provider value={{
+      user,
+      redirectError,
+      signInWithGoogle,
+      signInWithEmail,
+      signUpWithEmail,
+      signOut: handleSignOut,
+    }}>
       {children}
     </AuthContext.Provider>
   );
