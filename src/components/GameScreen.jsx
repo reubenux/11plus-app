@@ -4,7 +4,7 @@ import GameComplete from "./GameComplete";
 import { playCorrect, playWrong } from "../utils/feedback";
 
 const TOTAL_QUESTIONS = 20;
-const BOARD_SIZE = 6;
+const BOARD_SIZE = 5;
 
 function shuffle(arr) {
   const a = [...arr];
@@ -45,7 +45,7 @@ export default function GameScreen({ level, gameType, onHome }) {
     return {
       board:      full.slice(0, BOARD_SIZE).map(makeItem),
       queue:      full.slice(BOARD_SIZE),          // 14 pairs waiting
-      rightOrder: shuffle([0, 1, 2, 3, 4, 5]),     // independent right-column order
+      rightOrder: shuffle([0, 1, 2, 3, 4]),          // independent right-column order
     };
   }
 
