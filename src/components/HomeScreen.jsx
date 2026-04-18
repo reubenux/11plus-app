@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { getBest, formatTime } from "../utils/leaderboard";
+import { getBest, getTopRuns, formatTime } from "../utils/leaderboard";
 
 const LEVELS = [
   { id: "A", label: "Level A", desc: "Easiest",      emoji: "🌱" },
@@ -22,12 +22,14 @@ const TYPE_INFO = {
 
 const Q_OPTIONS = [5, 10, 20, 30];
 const MAX_STARS = 60;
+const MEDALS = ["🥇", "🥈", "🥉", "4", "5"];
 
 export default function HomeScreen({ gameType, onPlay }) {
   const [level, setLevel]               = useState("A");
   const [totalQuestions, setTotal]      = useState(20);
-  const info = TYPE_INFO[gameType];
-  const best = getBest(level, gameType);
+  const info    = TYPE_INFO[gameType];
+  const best    = getBest(level, gameType);
+  const topRuns = getTopRuns(level, gameType, 5);
 
   return (
     <div className="home-screen">
@@ -90,6 +92,34 @@ export default function HomeScreen({ gameType, onPlay }) {
         ) : (
           <div className="home-best home-best--empty">
             No score yet — be the first! 🎯
+          </div>
+        )}
+
+        {topRuns.length > 0 && (
+          <div className="leaderboard">
+            <div className="section-label">🏆 Top {topRuns.length} Scores</div>
+            <table className="lb-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Stars</th>
+                  <th>Wrong</th>
+                  <th>Time</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {topRuns.map((r, i) => (
+                  <tr key={i} className={i === 0 ? "lb-row lb-top" : "lb-row"}>
+                    <td className="lb-rank">{MEDALS[i]}</td>
+                    <td>⭐ {r.stars}/{MAX_STARS}</td>
+                    <td className={r.wrong === 0 ? "lb-zero" : ""}>{r.wrong}</td>
+                    <td>{formatTime(r.time ?? 0)}</td>
+                    <td className="lb-date">{r.date}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
 

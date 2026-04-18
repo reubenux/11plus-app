@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { saveIfBest, getBest, formatTime } from "../utils/leaderboard";
+import { saveIfBest, saveRun, getBest, formatTime } from "../utils/leaderboard";
 
 function Stars({ count }) {
   return (
@@ -18,7 +18,10 @@ export default function GameComplete({ results, totalWrong, timeTaken, onPlayAga
   const title      = pct === 100 ? "🌟 Perfect!" : pct >= 70 ? "🎉 Great job!" : "✅ Done!";
 
   const [prevBest]  = useState(() => getBest(level, gameType));
-  const [isNewBest] = useState(() => saveIfBest(level, gameType, totalStars, totalWrong, timeTaken));
+  const [isNewBest] = useState(() => {
+    saveRun(level, gameType, totalStars, totalWrong, timeTaken);
+    return saveIfBest(level, gameType, totalStars, totalWrong, timeTaken);
+  });
 
   return (
     <div className="summary-overlay">
