@@ -11,6 +11,7 @@ export default function App() {
   const [selectedGame, setSelectedGame] = useState(WORD_MATCH_ID);
   const [gameType, setGameType] = useState("synonyms");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const [screen, setScreen] = useState("home");
   const [config, setConfig] = useState(null);
@@ -42,6 +43,8 @@ export default function App() {
         onGameTypeChange={(t) => { setGameType(t); setScreen("home"); }}
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
+        isCollapsed={sidebarCollapsed}
+        onToggleCollapse={() => setSidebarCollapsed((c) => !c)}
       />
 
       <div className="main-area">

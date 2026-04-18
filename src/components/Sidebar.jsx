@@ -26,6 +26,8 @@ export default function Sidebar({
   onGameTypeChange,
   isOpen,
   onClose,
+  isCollapsed,
+  onToggleCollapse,
 }) {
   function handleSelect(id) {
     onSelectGame(id);
@@ -36,29 +38,39 @@ export default function Sidebar({
     <>
       {isOpen && <div className="sidebar-overlay" onClick={onClose} />}
 
-      <aside className={`sidebar ${isOpen ? "open" : ""}`}>
+      <aside className={`sidebar ${isOpen ? "open" : ""} ${isCollapsed ? "collapsed" : ""}`}>
         <div className="sidebar-header">
-          <span className="sidebar-logo">🎓</span>
-          <div>
-            <div className="sidebar-title">11+ Prep</div>
-            <div className="sidebar-sub">Grammar &amp; Maths</div>
-          </div>
+          {!isCollapsed && <span className="sidebar-logo">🎓</span>}
+          {!isCollapsed && (
+            <div>
+              <div className="sidebar-title">11+ Prep</div>
+              <div className="sidebar-sub">Grammar &amp; Maths</div>
+            </div>
+          )}
+          <button
+            className="sidebar-toggle"
+            onClick={onToggleCollapse}
+            aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            {isCollapsed ? "▶" : "◀"}
+          </button>
           <button className="sidebar-close" onClick={onClose}>✕</button>
         </div>
 
         <nav className="sidebar-nav">
-          <div className="sidebar-section-label">English</div>
+          {!isCollapsed && <div className="sidebar-section-label">English</div>}
           {ENGLISH_GAMES.map((g) => (
             <React.Fragment key={g.id}>
               <button
                 className={`sidebar-item ${selectedGame === g.id ? "active" : ""}`}
                 onClick={() => handleSelect(g.id)}
+                title={isCollapsed ? g.label : undefined}
               >
                 <span className="sidebar-item-icon">{g.icon}</span>
-                <span className="sidebar-item-label">{g.label}</span>
+                {!isCollapsed && <span className="sidebar-item-label">{g.label}</span>}
               </button>
 
-              {g.id === "wordMatch" && selectedGame === "wordMatch" && (
+              {g.id === "wordMatch" && selectedGame === "wordMatch" && !isCollapsed && (
                 <div className="sidebar-sub-options">
                   <button
                     className={`sub-opt ${gameType === "synonyms" ? "active" : ""}`}
@@ -74,20 +86,20 @@ export default function Sidebar({
                   </button>
                 </div>
               )}
-
             </React.Fragment>
           ))}
 
-          <div className="sidebar-section-label">Maths</div>
+          {!isCollapsed && <div className="sidebar-section-label">Maths</div>}
           {MATHS_GAMES.map((g) => (
             <button
               key={g.id}
               className={`sidebar-item ${selectedGame === g.id ? "active" : ""}`}
               onClick={() => handleSelect(g.id)}
+              title={isCollapsed ? g.label : undefined}
             >
               <span className="sidebar-item-icon">{g.icon}</span>
-              <span className="sidebar-item-label">{g.label}</span>
-              <span className="coming-pill">Soon</span>
+              {!isCollapsed && <span className="sidebar-item-label">{g.label}</span>}
+              {!isCollapsed && <span className="coming-pill">Soon</span>}
             </button>
           ))}
         </nav>

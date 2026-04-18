@@ -24,7 +24,11 @@ body {
   overflow-y: auto;
   overflow-x: hidden;
   z-index: 200;
-  transition: transform 0.25s ease;
+  transition: transform 0.25s ease, width 0.25s ease;
+}
+
+.sidebar.collapsed {
+  width: 64px;
 }
 
 .sidebar-overlay {
@@ -41,6 +45,31 @@ body {
   gap: 10px;
   padding: 22px 16px 18px;
   border-bottom: 1px solid #e5e7eb;
+  min-height: 72px;
+}
+
+.sidebar.collapsed .sidebar-header {
+  justify-content: center;
+  padding: 22px 8px 18px;
+}
+
+.sidebar.collapsed .sidebar-toggle {
+  margin-left: 0;
+}
+
+.sidebar.collapsed .sidebar-nav {
+  padding: 12px 6px 24px;
+  align-items: center;
+}
+
+.sidebar.collapsed .sidebar-item {
+  justify-content: center;
+  padding: 12px 0;
+}
+
+.sidebar.collapsed .sidebar-item-icon {
+  width: auto;
+  font-size: 1.3rem;
 }
 
 .sidebar-logo {
@@ -62,8 +91,22 @@ body {
   margin-top: 2px;
 }
 
-.sidebar-close {
+.sidebar-toggle {
   margin-left: auto;
+  background: none;
+  border: none;
+  color: #6b7280;
+  font-size: 0.75rem;
+  padding: 6px 8px;
+  border-radius: 6px;
+  transition: background 0.15s, color 0.15s;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: none;
+}
+.sidebar-toggle:hover { background: #f3f4f6; color: #4f46e5; }
+
+.sidebar-close {
   background: none;
   border: none;
   color: #6b7280;
@@ -232,6 +275,11 @@ body {
   .hamburger       { display: block; }
 
   .main-content { padding-top: 64px; }
+}
+
+/* ───── Desktop / Tablet landscape: show collapse toggle ───── */
+@media (min-width: 1024px) {
+  .sidebar-toggle { display: block; }
 }
 
 /* ───── Tablet portrait (768–1023 px) ───── */
