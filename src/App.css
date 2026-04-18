@@ -713,6 +713,18 @@ button { cursor: pointer; font-family: inherit; }
   font-weight: 800;
 }
 
+.timer-badge {
+  background: #f3f4f6;
+  color: #374151;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.gc-time { color: #374151; }
+
 .mute-btn {
   background: #f3f4f6;
   border: none;

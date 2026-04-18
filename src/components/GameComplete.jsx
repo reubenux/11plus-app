@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { saveIfBest, getBest } from "../utils/leaderboard";
+import { saveIfBest, getBest, formatTime } from "../utils/leaderboard";
 
 function Stars({ count }) {
   return (
@@ -11,15 +11,14 @@ function Stars({ count }) {
   );
 }
 
-export default function GameComplete({ results, totalWrong, onPlayAgain, onHome, level, gameType }) {
+export default function GameComplete({ results, totalWrong, timeTaken, onPlayAgain, onHome, level, gameType }) {
   const totalStars = results.reduce((sum, r) => sum + r.stars, 0);
   const maxStars   = results.length * 3;
   const pct        = Math.round((totalStars / maxStars) * 100);
   const title      = pct === 100 ? "🌟 Perfect!" : pct >= 70 ? "🎉 Great job!" : "✅ Done!";
 
-  // Save once on mount; capture previous best before saving
   const [prevBest]  = useState(() => getBest(level, gameType));
-  const [isNewBest] = useState(() => saveIfBest(level, gameType, totalStars, totalWrong));
+  const [isNewBest] = useState(() => saveIfBest(level, gameType, totalStars, totalWrong, timeTaken));
 
   return (
     <div className="summary-overlay">
@@ -27,14 +26,12 @@ export default function GameComplete({ results, totalWrong, onPlayAgain, onHome,
         <h2 className="summary-title">{title}</h2>
 
         {isNewBest && (
-          <div className="new-best-banner">
-            🏆 New Personal Best!
-          </div>
+          <div className="new-best-banner">🏆 New Personal Best!</div>
         )}
 
         {!isNewBest && prevBest && (
           <div className="prev-best-banner">
-            Previous best: ⭐ {prevBest.stars}/{maxStars} · {prevBest.wrong} wrong · {prevBest.date}
+            Previous best: ⭐ {prevBest.stars}/{maxStars} · {prevBest.wrong} wrong · ⏱ {formatTime(prevBest.time)} · {prevBest.date}
           </div>
         )}
 
@@ -50,6 +47,10 @@ export default function GameComplete({ results, totalWrong, onPlayAgain, onHome,
           <div className="gc-stat">
             <span className="gc-stat-value gc-stars">{totalStars}/{maxStars}</span>
             <span className="gc-stat-label">Stars</span>
+          </div>
+          <div className="gc-stat">
+            <span className="gc-stat-value gc-time">⏱ {formatTime(timeTaken)}</span>
+            <span className="gc-stat-label">Time</span>
           </div>
         </div>
 

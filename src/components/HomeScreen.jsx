@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { getBest } from "../utils/leaderboard";
+import { getBest, formatTime } from "../utils/leaderboard";
 
 const LEVELS = [
   { id: "A", label: "Level A", desc: "Easiest",      emoji: "🌱" },
@@ -85,7 +85,7 @@ export default function HomeScreen({ gameType, onPlay }) {
           <div className="home-best">
             <span className="home-best-label">🏆 Personal Best</span>
             <span className="home-best-score">⭐ {best.stars}/{MAX_STARS}</span>
-            <span className="home-best-detail">{best.wrong} wrong · {best.date}</span>
+            <span className="home-best-detail">{best.wrong} wrong · ⏱ {formatTime(best.time ?? 0)} · {best.date}</span>
           </div>
         ) : (
           <div className="home-best home-best--empty">

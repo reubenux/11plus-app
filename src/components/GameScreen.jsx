@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { wordData } from "../data/words";
 import GameComplete from "./GameComplete";
 import { playCorrect, playWrong } from "../utils/feedback";
@@ -57,6 +57,16 @@ export default function GameScreen({ level, gameType, totalQuestions = 20, onHom
   const [totalWrong, setTotalWrong]   = useState(0);
   const [gameComplete, setGameComplete] = useState(false);
   const [muted, setMuted]             = useState(false);
+  const [elapsed, setElapsed]         = useState(0);
+  const startTimeRef                  = useRef(Date.now());
+
+  useEffect(() => {
+    if (gameComplete) return;
+    const id = setInterval(() => {
+      setElapsed(Math.floor((Date.now() - startTimeRef.current) / 1000));
+    }, 1000);
+    return () => clearInterval(id);
+  }, [gameComplete]);
 
   const { board, queue, rightOrder } = game;
 
@@ -154,6 +164,7 @@ export default function GameScreen({ level, gameType, totalQuestions = 20, onHom
         <GameComplete
           results={results}
           totalWrong={totalWrong}
+          timeTaken={elapsed}
           onPlayAgain={handlePlayAgain}
           onHome={onHome}
           level={level}
@@ -168,6 +179,7 @@ export default function GameScreen({ level, gameType, totalQuestions = 20, onHom
         {streak > 0 && <span className="streak-badge">🔥 {streak}</span>}
         <span className="correct-badge">✓ {results.length}</span>
         <span className="wrong-badge">✗ {totalWrong}</span>
+        <span className="timer-badge">⏱ {Math.floor(elapsed/60)}:{String(elapsed%60).padStart(2,"0")}</span>
         <button className="mute-btn" onClick={() => setMuted((m) => !m)} aria-label={muted ? "Unmute" : "Mute"}>
           {muted ? "🔇" : "🔊"}
         </button>
