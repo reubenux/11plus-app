@@ -19,8 +19,12 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(undefined); // undefined = loading
 
   useEffect(() => {
-    // Handle redirect-based sign-in result (fallback from popup on some browsers)
-    getRedirectResult(auth).catch(() => {});
+    // Process any pending Google redirect result first
+    getRedirectResult(auth)
+      .then((result) => {
+        if (result?.user) console.log("Redirect sign-in successful:", result.user.email);
+      })
+      .catch((e) => console.error("getRedirectResult error:", e.code));
 
     const unsub = onAuthStateChanged(auth, async (u) => {
       try {
@@ -35,17 +39,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   async function signInWithGoogle() {
-    const provider = new GoogleAuthProvider();
-    try {
-      await signInWithPopup(auth, provider);
-    } catch (e) {
-      // Popup blocked or not supported — fall back to redirect
-      if (e.code === "auth/popup-blocked" || e.code === "auth/popup-cancelled" || e.code === "auth/cancelled-popup-request") {
-        await signInWithRedirect(auth, provider);
-      } else {
-        throw e;
-      }
-    }
+    await signInWithRedirect(auth, new GoogleAuthProvider());
   }
 
   async function signInWithEmail(email, password) {
