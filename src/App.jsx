@@ -4,12 +4,27 @@ import HomeScreen from "./components/HomeScreen";
 import GameScreen from "./components/GameScreen";
 import ComingSoon from "./components/ComingSoon";
 import AuthButton from "./components/AuthButton";
-import { AuthProvider } from "./contexts/AuthContext";
+import LoginScreen from "./components/LoginScreen";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import "./App.css";
 
 const WORD_MATCH_ID = "wordMatch";
 
 function AppInner() {
+  const { user } = useAuth();
+
+  // Still checking auth state
+  if (user === undefined) {
+    return (
+      <div className="app-loading">
+        <span className="app-loading-logo">🎓</span>
+        <p>Loading…</p>
+      </div>
+    );
+  }
+
+  // Not signed in — show login
+  if (user === null) return <LoginScreen />;
   const [selectedGame, setSelectedGame] = useState(WORD_MATCH_ID);
   const [gameType, setGameType] = useState("synonyms");
   const [sidebarOpen, setSidebarOpen] = useState(false);

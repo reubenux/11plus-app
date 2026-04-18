@@ -4,6 +4,9 @@ import {
   signInWithPopup,
   signOut,
   onAuthStateChanged,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  updateProfile,
 } from "firebase/auth";
 import { auth } from "../firebase";
 import { mergeFromCloud } from "../utils/cloudScores";
@@ -11,7 +14,7 @@ import { mergeFromCloud } from "../utils/cloudScores";
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(undefined); // undefined = still loading
+  const [user, setUser] = useState(undefined); // undefined = loading
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (u) => {
@@ -22,11 +25,16 @@ export function AuthProvider({ children }) {
   }, []);
 
   async function signInWithGoogle() {
-    try {
-      await signInWithPopup(auth, new GoogleAuthProvider());
-    } catch (e) {
-      console.error("Sign-in failed:", e);
-    }
+    await signInWithPopup(auth, new GoogleAuthProvider());
+  }
+
+  async function signInWithEmail(email, password) {
+    await signInWithEmailAndPassword(auth, email, password);
+  }
+
+  async function signUpWithEmail(email, password, name) {
+    const cred = await createUserWithEmailAndPassword(auth, email, password);
+    if (name) await updateProfile(cred.user, { displayName: name });
   }
 
   async function handleSignOut() {
@@ -34,7 +42,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, signInWithGoogle, signOut: handleSignOut }}>
+    <AuthContext.Provider value={{ user, signInWithGoogle, signInWithEmail, signUpWithEmail, signOut: handleSignOut }}>
       {children}
     </AuthContext.Provider>
   );
