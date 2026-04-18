@@ -12,16 +12,20 @@ function GoogleIcon() {
   );
 }
 
-function friendlyError(code) {
+function friendlyError(code, message) {
   switch (code) {
     case "auth/user-not-found":
     case "auth/wrong-password":
-    case "auth/invalid-credential": return "Incorrect email or password.";
+    case "auth/invalid-credential":    return "Incorrect email or password.";
     case "auth/email-already-in-use":  return "An account with this email already exists.";
-    case "auth/weak-password":          return "Password must be at least 6 characters.";
-    case "auth/invalid-email":          return "Please enter a valid email address.";
-    case "auth/too-many-requests":      return "Too many attempts. Please try again later.";
-    default:                            return "Something went wrong. Please try again.";
+    case "auth/weak-password":         return "Password must be at least 6 characters.";
+    case "auth/invalid-email":         return "Please enter a valid email address.";
+    case "auth/too-many-requests":     return "Too many attempts. Please try again later.";
+    case "auth/popup-blocked":         return "Popup was blocked — please allow popups for this site.";
+    case "auth/popup-closed-by-user":  return "Sign-in window was closed. Please try again.";
+    case "auth/unauthorized-domain":   return "This domain isn't authorised in Firebase. Add it in Firebase Console → Authentication → Settings → Authorised domains.";
+    case "auth/cancelled-popup-request": return null; // user opened another popup, ignore
+    default:                           return message || "Something went wrong. Please try again.";
   }
 }
 
@@ -56,7 +60,9 @@ export default function LoginScreen() {
     try {
       await signInWithGoogle();
     } catch (err) {
-      setError(friendlyError(err.code));
+      console.error("Google sign-in error:", err.code, err.message);
+      const msg = friendlyError(err.code, err.message);
+      if (msg) setError(msg);
     }
   }
 
