@@ -7,19 +7,34 @@ export function formatTime(seconds) {
   return `${m}:${String(s).padStart(2, "0")}`;
 }
 
+function ordinal(n) {
+  const s = ["th","st","nd","rd"];
+  const v = n % 100;
+  return n + (s[(v - 20) % 10] || s[v] || s[0]);
+}
+
+export function formatDate(dateStr) {
+  if (!dateStr) return "";
+  const d = new Date(dateStr.split("/").reverse().join("-")); // parse dd/mm/yyyy
+  const day   = ordinal(d.getDate());
+  const month = d.toLocaleString("en-GB", { month: "short" });
+  const year  = String(d.getFullYear()).slice(2);
+  return `${day} ${month} ${year}`;
+}
+
 // ── Personal best ────────────────────────────────────────────────
 export function getAllBests() {
   try { return JSON.parse(localStorage.getItem(BEST_KEY)) || {}; }
   catch { return {}; }
 }
 
-export function getBest(level, gameType) {
-  return getAllBests()[`${level}-${gameType}`] || null;
+export function getBest(level, gameType, totalQuestions) {
+  return getAllBests()[`${level}-${gameType}-${totalQuestions}`] || null;
 }
 
-export function saveIfBest(level, gameType, stars, wrong, time) {
+export function saveIfBest(level, gameType, totalQuestions, stars, wrong, time) {
   const all  = getAllBests();
-  const key  = `${level}-${gameType}`;
+  const key  = `${level}-${gameType}-${totalQuestions}`;
   const prev = all[key];
   const isNew =
     !prev ||
@@ -40,19 +55,18 @@ function getAllHistory() {
   catch { return {}; }
 }
 
-export function saveRun(level, gameType, stars, wrong, time) {
-  const all = getAllHistory();
-  const key = `${level}-${gameType}`;
+export function saveRun(level, gameType, totalQuestions, stars, wrong, time, name) {
+  const all  = getAllHistory();
+  const key  = `${level}-${gameType}-${totalQuestions}`;
   const runs = all[key] || [];
-  runs.push({ stars, wrong, time, date: new Date().toLocaleDateString("en-GB") });
-  // Keep only last 50 runs to cap storage
+  runs.push({ stars, wrong, time, name: name || "You", date: new Date().toLocaleDateString("en-GB") });
   all[key] = runs.slice(-50);
   try { localStorage.setItem(HISTORY_KEY, JSON.stringify(all)); } catch {}
 }
 
-export function getTopRuns(level, gameType, n = 5) {
+export function getTopRuns(level, gameType, totalQuestions, n = 5) {
   const all  = getAllHistory();
-  const runs = all[`${level}-${gameType}`] || [];
+  const runs = all[`${level}-${gameType}-${totalQuestions}`] || [];
   return [...runs]
     .sort((a, b) =>
       b.stars - a.stars ||

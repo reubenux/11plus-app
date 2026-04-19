@@ -170,6 +170,7 @@ export default function GameScreen({ level, gameType, totalQuestions = 20, onHom
         onHome={onHome}
         level={level}
         gameType={gameType}
+        totalQuestions={totalQuestions}
       />
     );
   }

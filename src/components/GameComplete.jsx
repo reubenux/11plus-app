@@ -13,17 +13,17 @@ function Stars({ count }) {
   );
 }
 
-export default function GameComplete({ results, totalWrong, timeTaken, onPlayAgain, onHome, level, gameType }) {
+export default function GameComplete({ results, totalWrong, timeTaken, onPlayAgain, onHome, level, gameType, totalQuestions }) {
   const totalStars = results.reduce((sum, r) => sum + r.stars, 0);
-  const maxStars   = results.length * 3;
+  const maxStars   = totalQuestions * 3;
   const pct        = Math.round((totalStars / maxStars) * 100);
   const title      = pct === 100 ? "🌟 Perfect!" : pct >= 70 ? "🎉 Great job!" : "✅ Done!";
 
   const { user } = useAuth();
-  const [prevBest]  = useState(() => getBest(level, gameType));
+  const [prevBest]  = useState(() => getBest(level, gameType, totalQuestions));
   const [isNewBest] = useState(() => {
-    saveRun(level, gameType, totalStars, totalWrong, timeTaken);
-    const newBest = saveIfBest(level, gameType, totalStars, totalWrong, timeTaken);
+    saveRun(level, gameType, totalQuestions, totalStars, totalWrong, timeTaken, user?.displayName);
+    const newBest = saveIfBest(level, gameType, totalQuestions, totalStars, totalWrong, timeTaken);
     if (user) pushToCloud(user.uid);
     return newBest;
   });

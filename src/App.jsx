@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import Sidebar from "./components/Sidebar";
 import HomeScreen from "./components/HomeScreen";
 import GameScreen from "./components/GameScreen";
+import PunctuationScreen from "./components/PunctuationScreen";
+import PunctuationGame from "./components/PunctuationGame";
 import ComingSoon from "./components/ComingSoon";
 import AuthButton from "./components/AuthButton";
 import LoginScreen from "./components/LoginScreen";
@@ -9,6 +11,7 @@ import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import "./App.css";
 
 const WORD_MATCH_ID = "wordMatch";
+const GRAMMAR_ID    = "grammar";
 
 function AppInner() {
   const { user } = useAuth();
@@ -26,8 +29,9 @@ function AppInner() {
   // Not signed in — show login
   if (user === null) return <LoginScreen />;
   const [selectedGame, setSelectedGame] = useState(WORD_MATCH_ID);
-  const [gameType, setGameType] = useState("synonyms");
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [gameType, setGameType]         = useState("synonyms");
+  const [grammarType, setGrammarType]   = useState("punctuation");
+  const [sidebarOpen, setSidebarOpen]   = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const [screen, setScreen] = useState("home");
@@ -50,6 +54,7 @@ function AppInner() {
   }
 
   const isWordMatch = selectedGame === WORD_MATCH_ID;
+  const isGrammar   = selectedGame === GRAMMAR_ID;
 
   return (
     <div className="app-layout">
@@ -58,6 +63,8 @@ function AppInner() {
         onSelectGame={handleSelectGame}
         gameType={gameType}
         onGameTypeChange={(t) => { setGameType(t); setScreen("home"); }}
+        grammarType={grammarType}
+        onGrammarTypeChange={(t) => { setGrammarType(t); setScreen("home"); }}
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
         isCollapsed={sidebarCollapsed}
@@ -74,12 +81,11 @@ function AppInner() {
         </button>
 
         <div className="main-content">
-          {!isWordMatch && <ComingSoon gameId={selectedGame} />}
+          {!isWordMatch && !isGrammar && <ComingSoon gameId={selectedGame} />}
 
           {isWordMatch && screen === "home" && (
             <HomeScreen gameType={gameType} onPlay={handlePlay} />
           )}
-
           {isWordMatch && screen === "game" && config && (
             <GameScreen
               key={playKey}
@@ -88,6 +94,21 @@ function AppInner() {
               totalQuestions={config.totalQuestions}
               onHome={handleHome}
             />
+          )}
+
+          {isGrammar && grammarType === "punctuation" && screen === "home" && (
+            <PunctuationScreen onPlay={handlePlay} />
+          )}
+          {isGrammar && grammarType === "punctuation" && screen === "game" && config && (
+            <PunctuationGame
+              key={playKey}
+              level={config.level}
+              totalQuestions={config.totalQuestions}
+              onHome={handleHome}
+            />
+          )}
+          {isGrammar && grammarType !== "punctuation" && (
+            <ComingSoon gameId={selectedGame} />
           )}
         </div>
 

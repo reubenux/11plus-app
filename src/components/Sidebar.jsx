@@ -2,7 +2,7 @@ import React, { useState } from "react";
 
 const ENGLISH_GAMES = [
   { id: "wordMatch", label: "Word Match", icon: "📚", subPages: true },
-  { id: "grammar",   label: "Grammar",    icon: "✏️" },
+  { id: "grammar",   label: "Grammar",    icon: "✏️", subPages: true },
 ];
 
 const MATHS_GAMES = [
@@ -37,6 +37,8 @@ export default function Sidebar({
   onSelectGame,
   gameType,
   onGameTypeChange,
+  grammarType,
+  onGrammarTypeChange,
   isOpen,
   onClose,
   isCollapsed,
@@ -115,7 +117,7 @@ export default function Sidebar({
                   {!isCollapsed && g.subPages && <ChevronIcon open={isExpanded} />}
                 </button>
 
-                {g.subPages && isExpanded && !isCollapsed && (
+                {g.id === "wordMatch" && isExpanded && !isCollapsed && (
                   <div className="sidebar-sub-options">
                     <button
                       className={`sub-opt ${gameType === "synonyms" ? "active" : ""}`}
@@ -128,6 +130,17 @@ export default function Sidebar({
                       onClick={() => { onGameTypeChange("antonyms"); onClose(); }}
                     >
                       🟠 Antonyms
+                    </button>
+                  </div>
+                )}
+
+                {g.id === "grammar" && isExpanded && !isCollapsed && (
+                  <div className="sidebar-sub-options">
+                    <button
+                      className={`sub-opt ${grammarType === "punctuation" ? "active" : ""}`}
+                      onClick={() => { onGrammarTypeChange("punctuation"); onClose(); }}
+                    >
+                      🔤 Punctuation
                     </button>
                   </div>
                 )}

@@ -522,9 +522,6 @@ body {
     min-height: 58px;
   }
 
-  .home-screen  { max-width: 560px; }
-  .home-card    { padding: 40px 36px; }
-
   .summary-overlay { max-width: 640px; }
 
   .coming-soon-screen { max-width: 520px; }
@@ -542,9 +539,6 @@ body {
     font-size: 1.05rem;
     min-height: 58px;
   }
-
-  .home-screen  { max-width: 540px; }
-  .home-card    { padding: 40px 36px; }
 
   .summary-card    { max-width: 660px; }
 
@@ -601,17 +595,32 @@ button { cursor: pointer; font-family: inherit; }
 /* ───── Home Screen ───── */
 .home-screen {
   width: 100%;
-  max-width: 480px;
 }
 
 .home-card {
-  background: white;
-  border-radius: 24px;
-  padding: 36px 32px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
   display: flex;
   flex-direction: column;
   gap: 20px;
+}
+
+.home-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  align-items: start;
+}
+
+.home-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* stack to single column on small screens */
+@media (max-width: 640px) {
+  .home-columns {
+    grid-template-columns: 1fr;
+  }
 }
 
 .home-title {
@@ -755,8 +764,15 @@ button { cursor: pointer; font-family: inherit; }
 }
 
 .lb-rank {
-  font-size: 1rem;
-  width: 28px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  width: 36px;
+  color: #7c3aed;
+}
+
+.lb-name {
+  font-weight: 600;
+  text-align: left;
 }
 
 .lb-zero { color: #15803d; font-weight: 800; }
@@ -985,6 +1001,97 @@ button { cursor: pointer; font-family: inherit; }
   transition: background 0.15s;
 }
 .mute-btn:hover { background: #e5e7eb; }
+
+/* ───── Punctuation Game ───── */
+.punct-game {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 8px 0;
+}
+
+.punct-prompt {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #6b7280;
+  margin: 0;
+}
+
+.punct-sentence-box {
+  background: #f5f3ff;
+  border: 2px solid #ddd6fe;
+  border-radius: 16px;
+  padding: 24px 28px;
+}
+
+.punct-sentence {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1e1b4b;
+  line-height: 1.7;
+}
+
+.punct-blank {
+  display: inline-block;
+  background: #ede9fe;
+  border-bottom: 3px solid #7c3aed;
+  padding: 0 6px;
+  margin: 0 2px;
+  border-radius: 4px;
+  color: #7c3aed;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.punct-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.punct-options--choice {
+  grid-template-columns: 1fr;
+}
+
+.punct-opt {
+  padding: 16px 20px;
+  border-radius: 14px;
+  border: 2.5px solid #e5e7eb;
+  background: #f9fafb;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1e1b4b;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s;
+  line-height: 1.4;
+}
+
+.punct-options:not(.punct-options--choice) .punct-opt {
+  text-align: center;
+  font-size: 1.4rem;
+  letter-spacing: 1px;
+}
+
+.punct-opt:hover:not(:disabled) {
+  border-color: #7c3aed;
+  background: #fdf4ff;
+  transform: scale(1.02);
+}
+
+.punct-opt.correct {
+  background: #dcfce7;
+  border-color: #16a34a;
+  color: #15803d;
+  animation: pop 0.35s ease;
+}
+
+.punct-opt.wrong {
+  background: #fef2f2;
+  border-color: #ef4444;
+  color: #dc2626;
+  animation: shake 0.5s ease;
+}
 
 /* ───── Round summary — fills the full main area beside the sidebar ───── */
 /* summary-overlay is just a plain flow wrapper — no overlay, no position */

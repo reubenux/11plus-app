@@ -7,41 +7,30 @@ const LEVELS = [
   { id: "C", label: "Level C", desc: "Hardest",      emoji: "🔥" },
 ];
 
-const TYPE_INFO = {
-  synonyms: {
-    emoji: "🟣",
-    label: "Synonyms",
-    description: "Synonyms are words that have the same or very similar meaning — e.g. Happy and Joyful.",
-  },
-  antonyms: {
-    emoji: "🟠",
-    label: "Antonyms",
-    description: "Antonyms are words that have opposite meanings — e.g. Happy and Sad.",
-  },
-};
-
 const Q_OPTIONS = [5, 10, 20, 30];
 const MEDALS = ["🥇", "🥈", "🥉", "4", "5"];
 
-export default function HomeScreen({ gameType, onPlay }) {
+export default function PunctuationScreen({ onPlay }) {
   const [level, setLevel]          = useState("A");
   const [totalQuestions, setTotal] = useState(20);
-  const info     = TYPE_INFO[gameType];
+
   const maxStars = totalQuestions * 3;
-  const best     = getBest(level, gameType, totalQuestions);
-  const topRuns  = getTopRuns(level, gameType, totalQuestions, 5);
+  const best     = getBest(level, "punctuation", totalQuestions);
+  const topRuns  = getTopRuns(level, "punctuation", totalQuestions, 5);
 
   return (
     <div className="home-screen">
       <div className="home-card">
 
         <div className="home-title">
-          <span className="home-emoji">📚</span>
-          <h1>Word Match</h1>
-          <p className="home-subtitle">{info.emoji} {info.label}</p>
+          <span className="home-emoji">✏️</span>
+          <h1>Punctuation</h1>
+          <p className="home-subtitle">🔤 Grammar</p>
         </div>
 
-        <p className="game-type-desc">{info.description}</p>
+        <p className="game-type-desc">
+          Learn how to use commas, full stops, apostrophes, question marks and more correctly in sentences.
+        </p>
 
         <div className="home-columns">
 
@@ -50,7 +39,7 @@ export default function HomeScreen({ gameType, onPlay }) {
             <div className="section-label">Choose Level</div>
             <div className="level-group">
               {LEVELS.map((l) => {
-                const lb = getBest(l.id, gameType, totalQuestions);
+                const lb = getBest(l.id, "punctuation", totalQuestions);
                 return (
                   <button
                     key={l.id}
