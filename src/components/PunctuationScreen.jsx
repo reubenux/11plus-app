@@ -10,9 +10,9 @@ const LEVELS = [
 const Q_OPTIONS = [5, 10, 20, 30];
 const MEDALS = ["🥇", "🥈", "🥉", "4", "5"];
 
-export default function PunctuationScreen({ onPlay }) {
-  const [level, setLevel]          = useState("A");
-  const [totalQuestions, setTotal] = useState(20);
+export default function PunctuationScreen({ onPlay, initialConfig }) {
+  const [level, setLevel]          = useState(initialConfig?.level ?? "A");
+  const [totalQuestions, setTotal] = useState(initialConfig?.totalQuestions ?? 20);
 
   const maxStars = totalQuestions * 3;
   const best     = getBest(level, "punctuation", totalQuestions);

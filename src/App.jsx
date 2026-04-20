@@ -37,6 +37,7 @@ function AppInner() {
   const [screen, setScreen] = useState("home");
   const [config, setConfig] = useState(null);
   const [playKey, setPlayKey] = useState(0);
+  const [lastPunctConfig, setLastPunctConfig] = useState(null);
 
   function handleSelectGame(id) {
     setSelectedGame(id);
@@ -44,6 +45,7 @@ function AppInner() {
   }
 
   function handlePlay(cfg) {
+    if (isGrammar && grammarType === "punctuation") setLastPunctConfig(cfg);
     setConfig(cfg);
     setPlayKey((k) => k + 1);
     setScreen("game");
@@ -97,7 +99,7 @@ function AppInner() {
           )}
 
           {isGrammar && grammarType === "punctuation" && screen === "home" && (
-            <PunctuationScreen onPlay={handlePlay} />
+            <PunctuationScreen onPlay={handlePlay} initialConfig={lastPunctConfig} />
           )}
           {isGrammar && grammarType === "punctuation" && screen === "game" && config && (
             <PunctuationGame

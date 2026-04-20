@@ -61,15 +61,7 @@ export default function PunctuationGame({ level, totalQuestions = 20, onHome, mu
   }, [gameComplete]);
 
   function handlePlayAgain() {
-    questions.current = prepareQuestions(level, totalQuestions);
-    startTimeRef.current = Date.now();
-    setElapsed(0);
-    setCurrent(0);
-    setWrongCount(0);
-    setResults([]);
-    setTotalWrong(0);
-    setFlash(null);
-    setGameComplete(false);
+    onHome();
   }
 
   function handleAnswer(idx) {
